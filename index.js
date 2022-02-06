@@ -2,6 +2,7 @@ const app = require("express")();
 const axios = require("axios");
 const jwt = require("jsonwebtoken");
 const cors = require("cors");
+const path = require("path");
 const querystring = require("querystring");
 const cookieParser = require("cookie-parser");
 require("dotenv").config();
