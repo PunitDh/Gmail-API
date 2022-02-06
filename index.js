@@ -1,10 +1,11 @@
-const app = require("express")();
+const express = require("express");
 const axios = require("axios");
 const jwt = require("jsonwebtoken");
 const cors = require("cors");
 const path = require("path");
 const querystring = require("querystring");
 const cookieParser = require("cookie-parser");
+const app = express();
 require("dotenv").config();
 
 const {
@@ -31,6 +32,8 @@ app.use(
   })
 );
 
+app.use(express.static(path.join(__dirname, "client", "build")));
+app.use(express.json());
 app.use(cookieParser());
 
 function getGoogleAuthURL() {
