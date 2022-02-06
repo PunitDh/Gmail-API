@@ -65,6 +65,15 @@ export default function Navigator(props) {
 
         <Box sx={{ bgcolor: "#101F33" }}>
           <ListItem disablePadding>
+            <ListItemButton selected={false} sx={item} onClick={() => {}}>
+              <ListItemIcon>
+                <PolicyIcon />
+              </ListItemIcon>
+              <ListItemText>Privacy Policy</ListItemText>
+            </ListItemButton>
+          </ListItem>
+
+          <ListItem disablePadding>
             <ListItemButton
               selected={true}
               sx={item}
@@ -74,19 +83,6 @@ export default function Navigator(props) {
                 <PeopleIcon />
               </ListItemIcon>
               <ListItemText>{me ? "Logout" : "Login"}</ListItemText>
-            </ListItemButton>
-          </ListItem>
-
-          <ListItem disablePadding>
-            <ListItemButton
-              selected={false}
-              sx={item}
-              onClick={me ? () => handleLogout(setMe) : handleLogin}
-            >
-              <ListItemIcon>
-                <PolicyIcon />
-              </ListItemIcon>
-              <ListItemText>Privacy Policy</ListItemText>
             </ListItemButton>
           </ListItem>
 

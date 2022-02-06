@@ -13,11 +13,13 @@ import {
 import { DataGrid } from "@mui/x-data-grid";
 import SearchIcon from "@mui/icons-material/Search";
 import RefreshIcon from "@mui/icons-material/Refresh";
+import LinearProgress from "@mui/material/LinearProgress";
 import { getMe, handleLogin, getEmailIDs, getEmail } from "../api/api";
 import { extractData } from "../api/utils";
 
 export default function Content({ me, setMe }) {
   const [emails, setEmails] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     getMe(setMe);
@@ -31,6 +33,7 @@ export default function Content({ me, setMe }) {
         Promise.all(emailPromises).then((es) => {
           es = extractData(es);
           setEmails(es);
+          setLoading(false);
         });
       });
     }
@@ -117,6 +120,19 @@ export default function Content({ me, setMe }) {
               justifyContent: "center",
             }}
           >
+            {loading ? (
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  width: "100%",
+                  height: "100%",
+                }}
+              >
+                <LinearProgress style={{ width: "100%" }} />
+              </div>
+            ) : null}
             {me && emails.length > 0 ? (
               <div style={{ height: 400, width: "100%" }}>
                 <DataGrid
