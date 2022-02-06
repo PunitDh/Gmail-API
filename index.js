@@ -211,6 +211,10 @@ app.delete("/api/auth/logout", (req, res) => {
   }
 });
 
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "client", "build", "index.html"));
+});
+
 app.listen(PORT, () => {
   console.log("Listening on port", PORT);
 });
