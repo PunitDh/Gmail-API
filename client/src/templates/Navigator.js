@@ -1,24 +1,20 @@
 import * as React from "react";
-import Divider from "@mui/material/Divider";
-import Drawer from "@mui/material/Drawer";
-import List from "@mui/material/List";
-import Box from "@mui/material/Box";
-import ListItem from "@mui/material/ListItem";
-import ListItemButton from "@mui/material/ListItemButton";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import ListItemText from "@mui/material/ListItemText";
+import {
+  Divider,
+  Drawer,
+  List,
+  Box,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  Typography,
+} from "@mui/material";
 import PolicyIcon from "@mui/icons-material/Policy";
 import PeopleIcon from "@mui/icons-material/People";
-import Typography from "@mui/material/Typography";
 import Logo from "../components/Logo";
 import { Link } from "react-router-dom";
-import { handleLogin, handleLogout } from "../api/auth";
-
-const categories = [
-  {
-    id: "Gmail API",
-  },
-];
+import { handleLogin, handleLogout } from "../api/api";
 
 const item = {
   py: "2px",

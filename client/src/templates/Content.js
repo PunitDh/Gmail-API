@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
+import GoogleButton from "react-google-button";
 import {
   AppBar,
   Toolbar,
   Typography,
   Paper,
   Grid,
-  Button,
   TextField,
   Tooltip,
   IconButton,
@@ -13,9 +13,8 @@ import {
 import { DataGrid } from "@mui/x-data-grid";
 import SearchIcon from "@mui/icons-material/Search";
 import RefreshIcon from "@mui/icons-material/Refresh";
-import { getMe, handleLogin, getEmailIDs, getEmail } from "../api/auth";
+import { getMe, handleLogin, getEmailIDs, getEmail } from "../api/api";
 import { extractData } from "../api/utils";
-import GoogleButton from "react-google-button";
 
 export default function Content({ me, setMe }) {
   const [emails, setEmails] = useState([]);
@@ -30,7 +29,6 @@ export default function Content({ me, setMe }) {
         const emailIDs = res.data;
         const emailPromises = emailIDs.map((emailID) => getEmail(emailID));
         Promise.all(emailPromises).then((es) => {
-          console.log(es);
           es = extractData(es);
           setEmails(es);
         });
@@ -119,7 +117,7 @@ export default function Content({ me, setMe }) {
               justifyContent: "center",
             }}
           >
-            {emails.length > 0 ? (
+            {me && emails.length > 0 ? (
               <div style={{ height: 400, width: "100%" }}>
                 <DataGrid
                   rows={emails}

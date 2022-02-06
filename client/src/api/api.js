@@ -16,8 +16,6 @@ export const handleLogin = () => {
 
 export const handleLogout = (setMe) => {
   axios.delete("/api/auth/logout", { withCredentials: true }).then((res) => {
-    console.log(res.data);
-    console.log("This is getting called");
     setMe(null);
     window.location.href = res.data;
   });

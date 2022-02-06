@@ -12,7 +12,7 @@ import {
   Typography,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
-import { handleLogin, handleLogout } from "../api/auth";
+import { handleLogin, handleLogout } from "../api/api";
 
 function Header({ me, setMe, onDrawerToggle }) {
   return (

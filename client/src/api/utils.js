@@ -6,6 +6,5 @@ export const extractData = (emailsArray) => {
     subject: email.data.messages[0].payload.headers[2].value,
     snippet: email.data.messages.map((message) => message.snippet),
   }));
-  console.log(emails);
   return emails;
 };

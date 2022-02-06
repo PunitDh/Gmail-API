@@ -1,21 +1,27 @@
-const express = require("express");
+const app = require("express")();
 const axios = require("axios");
 const jwt = require("jsonwebtoken");
 const cors = require("cors");
 const querystring = require("querystring");
 const cookieParser = require("cookie-parser");
-
-const app = express();
 require("dotenv").config();
 
-const PORT = process.env.PORT || 5000;
-const REDIRECT_URI = "/auth/google/";
-const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
-const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
-const SERVER_ROOT_URL = process.env.SERVER_ROOT_URL;
-const UI_ROOT_URI = process.env.UI_ROOT_URI;
-const JWT_SECRET = process.env.JWT_SECRET;
-const COOKIE_NAME = process.env.COOKIE_NAME;
+const {
+  PORT,
+  REDIRECT_URI,
+  GOOGLE_CLIENT_ID,
+  GOOGLE_CLIENT_SECRET,
+  SERVER_ROOT_URL,
+  UI_ROOT_URI,
+  JWT_SECRET,
+  COOKIE_NAME,
+  GOOGLE_AUTH_URL,
+  GOOGLE_AUTH_SCOPE,
+  GOOGLE_TOKEN_URL,
+  GOOGLE_USER_ACCESS_TOKEN_URL,
+  GMAIL_THREADS_URL,
+  GMAIL_BATCH_DELETE_URL,
+} = process.env;
 
 app.use(
   cors({
@@ -27,18 +33,14 @@ app.use(
 app.use(cookieParser());
 
 function getGoogleAuthURL() {
-  const rootUrl = "https://accounts.google.com/o/oauth2/v2/auth";
+  const rootUrl = GOOGLE_AUTH_URL;
   const options = {
     redirect_uri: `${SERVER_ROOT_URL}${REDIRECT_URI}`,
     client_id: GOOGLE_CLIENT_ID,
     access_type: "offline",
     response_type: "code",
     prompt: "consent",
-    scope: [
-      "https://www.googleapis.com/auth/userinfo.profile",
-      "https://www.googleapis.com/auth/userinfo.email",
-      "https://mail.google.com/",
-    ].join(" "),
+    scope: GOOGLE_AUTH_SCOPE,
   };
   const url = `${rootUrl}?${querystring.stringify(options)}`;
   console.log(url);
@@ -46,7 +48,7 @@ function getGoogleAuthURL() {
 }
 
 function getTokens({ code, client_id, client_secret, redirect_uri }) {
-  const url = "https://oauth2.googleapis.com/token";
+  const url = GOOGLE_TOKEN_URL;
   const values = {
     code,
     client_id,
@@ -62,7 +64,7 @@ function getTokens({ code, client_id, client_secret, redirect_uri }) {
     })
     .then((res) => res.data)
     .catch((err) => {
-      throw new Error(err.message);
+      console.log(err.message);
     });
 }
 
@@ -83,17 +85,14 @@ app.get(REDIRECT_URI, async (req, res) => {
     redirect_uri: `${SERVER_ROOT_URL}${REDIRECT_URI}`,
   });
   const googleUser = await axios
-    .get(
-      `https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token=${access_token}`,
-      {
-        headers: {
-          Authorization: `Bearer ${id_token}`,
-        },
-      }
-    )
+    .get(`${GOOGLE_USER_ACCESS_TOKEN_URL}=${access_token}`, {
+      headers: {
+        Authorization: `Bearer ${id_token}`,
+      },
+    })
     .then((res) => res.data)
     .catch((err) => {
-      throw new Error(err.message);
+      console.log(err.message);
     });
 
   console.log({ id_token, access_token, googleUser });
@@ -126,15 +125,13 @@ app.get("/api/auth/me", (req, res) => {
 // Get the current user's unread emails
 app.get("/api/emails", (req, res) => {
   console.log("Started GET /api/emails at", new Date().toLocaleString());
-
-  const emailsURL = "https://gmail.googleapis.com/gmail/v1/users/me/threads";
   const options = {
     q: "is:unread",
     maxResults: 500,
     includeSpamTrash: false,
     labelIds: ["UNREAD", "INBOX"],
   };
-  const url = `${emailsURL}?${querystring.stringify(options)}`;
+  const url = `${GMAIL_THREADS_URL}?${querystring.stringify(options)}`;
   console.log(url);
 
   return axios
@@ -149,7 +146,7 @@ app.get("/api/emails", (req, res) => {
       res.status(200).send(emailIDs);
     })
     .catch((err) => {
-      throw new Error(err.message);
+      console.log(err.message);
     });
 });
 
@@ -159,7 +156,7 @@ app.get("/api/emails/:id", (req, res) => {
     `Started GET /api/emails/${req.params.id} at`,
     new Date().toLocaleString()
   );
-  const emailURL = `https://gmail.googleapis.com/gmail/v1/users/me/threads/${req.params.id}`;
+  const emailURL = `${GMAIL_THREADS_URL}/${req.params.id}`;
   const options = {
     format: "metadata",
     metadataHeaders: ["From", "Subject", "Date"],
@@ -176,20 +173,18 @@ app.get("/api/emails/:id", (req, res) => {
     })
     .then((response) => res.status(200).send(response.data))
     .catch((err) => {
-      throw new Error(err.message);
+      console.log(err.message);
     });
 });
 
 // Batch delete emails
 app.post("/api/emails/batchdelete", (req, res) => {
   console.log(`Started POST /api/emails/batch at`, new Date().toLocaleString());
-  const batchURL =
-    "https://gmail.googleapis.com/gmail/v1/users/me/messages/batchDelete";
   const options = {
     ids: req.body.ids,
   };
   return axios
-    .post(batchURL, {
+    .post(GMAIL_BATCH_DELETE_URL, {
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
         Authorization: `Bearer ${req.cookies.access_token}`,
@@ -198,7 +193,7 @@ app.post("/api/emails/batchdelete", (req, res) => {
     })
     .then((response) => res.status(200).send(response.data))
     .catch((err) => {
-      throw new Error(err.message);
+      console.log(err.message);
     });
 });
 
