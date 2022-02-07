@@ -7,7 +7,6 @@ export const extractData = (emailsArray) => {
     });
     props.id = email.id;
     props.snippet = email.messages[0].snippet;
-
     return props;
   });
   return emails;

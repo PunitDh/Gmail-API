@@ -93,6 +93,9 @@ export default function Content({ me, setMe }) {
       renderCell: (params) => {
         return <>{params.row["Date"]}</>;
       },
+      valueGetter: (params) => {
+        return Date.parse(params.row["Date"]);
+      },
     },
   ];
 
