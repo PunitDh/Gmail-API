@@ -5,6 +5,7 @@ const cors = require("cors");
 const path = require("path");
 const querystring = require("querystring");
 const cookieParser = require("cookie-parser");
+const { parseBatch } = require("./utils");
 const app = express();
 require("dotenv").config();
 
@@ -33,7 +34,7 @@ app.use(
   })
 );
 
-// app.use(express.static(path.join(__dirname, "client", "build")));
+app.use(express.static(path.join(__dirname, "client", "build")));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
@@ -48,7 +49,6 @@ function getGoogleAuthURL() {
     scope: GOOGLE_AUTH_SCOPE,
   };
   const url = `${rootUrl}?${querystring.stringify(options)}`;
-  console.log(url);
   return url;
 }
 
@@ -100,7 +100,6 @@ app.get("/auth/google/", async (req, res) => {
       console.log(err.message);
     });
 
-  console.log({ id_token, access_token, googleUser });
   const token = jwt.sign(googleUser, JWT_SECRET);
   res.cookie(COOKIE_NAME, token, {
     maxAge: 900000,
@@ -137,7 +136,6 @@ app.get("/api/emails", (req, res) => {
     labelIds: ["UNREAD", "INBOX"],
   };
   const url = `${GMAIL_THREADS_URL}?${querystring.stringify(options)}`;
-  console.log(url);
 
   return axios
     .get(url, {
@@ -167,7 +165,6 @@ app.get("/api/emails/:id", (req, res) => {
     metadataHeaders: ["From", "Subject", "Date"],
   };
   const url = `${emailURL}?${querystring.stringify(options)}`;
-  console.log(url);
 
   return axios
     .get(url, {
@@ -211,8 +208,8 @@ app.post("/api/batchfetch", (req, res) => {
       },
     })
     .then((response) => {
-      console.log(response.data);
-      return res.status(200).send(response.data);
+      const data = parseBatch(response.data);
+      return res.status(200).send(data);
     })
     .catch((err) => {
       console.log(err.message);
@@ -220,21 +217,15 @@ app.post("/api/batchfetch", (req, res) => {
 });
 
 // Batch delete emails
-app.post("/api/emails/batchdelete", (req, res) => {
-  console.log(
-    `Started POST /api/emails/batchdelete at`,
-    new Date().toLocaleString()
-  );
-  const options = {
-    ids: req.body.ids,
-  };
+app.post("/api/batchdelete", (req, res) => {
+  console.log(`Started POST /api/batchdelete at`, new Date().toLocaleString());
+  const emailIDs = req.body.emailIDs.split(",");
   return axios
-    .post(GMAIL_BATCH_DELETE_URL, {
+    .post(GMAIL_BATCH_DELETE_URL, emailIDs, {
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
         Authorization: `Bearer ${req.cookies.access_token}`,
       },
-      body: JSON.stringify(options),
     })
     .then((response) => res.status(200).send(response.data))
     .catch((err) => {
@@ -256,10 +247,10 @@ app.delete("/api/auth/logout", (req, res) => {
   }
 });
 
-// app.get("*", (req, res) => {
-//   res.sendFile(path.join(__dirname, "client", "build", "index.html"));
-// });
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "client", "build", "index.html"));
+});
 
 app.listen(PORT, () => {
-  console.log("Listening on port", PORT);
+  console.log("Server listening on port", PORT);
 });

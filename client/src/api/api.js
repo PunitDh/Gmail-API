@@ -35,3 +35,12 @@ export const getEmails = (emailIDs) => {
     withCredentials: true,
   });
 };
+
+export const batchDeleteEmails = (emailIDs) => {
+  const body = new URLSearchParams();
+  body.append("emailIDs", emailIDs);
+
+  return axios.post(`/api/batchdelete`, body, {
+    withCredentials: true,
+  });
+};

@@ -35,14 +35,11 @@ export default function Content({ me, setMe }) {
     if (me) {
       getEmailIDs().then((res) => {
         const emailIDs = res.data;
-        console.log(emailIDs);
-        getEmails(emailIDs).then((response) => console.log(response.data));
-        // const emailPromises = emailIDs.map((emailID) => getEmail(emailID));
-        // Promise.all(emailPromises).then((es) => {
-        //   es = extractData(es);
-        //   setEmails(es);
-        //   setLoading(false);
-        // });
+        getEmails(emailIDs).then((response) => {
+          const es = extractData(response.data);
+          setEmails(es);
+          setLoading(false);
+        });
       });
     }
   }, [me]);
@@ -51,33 +48,33 @@ export default function Content({ me, setMe }) {
     {
       field: "From",
       headerName: "From",
-      width: "150",
+      width: "200",
       renderCell: (params) => {
-        return <>{params.row.from}</>;
+        return <>{params.row["From"]}</>;
       },
     },
     {
       field: "Subject",
       headerName: "Subject",
-      width: "150",
+      width: "200",
       renderCell: (params) => {
-        return <>{params.row.subject}</>;
+        return <>{params.row["Subject"]}</>;
       },
     },
     {
       field: "Message",
       headerName: "Message",
-      width: "150",
+      width: "200",
       renderCell: (params) => {
-        return <>{params.row.snippet[0]}</>;
+        return <>{params.row["snippet"]}</>;
       },
     },
     {
       field: "Date",
       headerName: "Date",
-      width: "150",
+      width: "200",
       renderCell: (params) => {
-        return <>{params.row.date}</>;
+        return <>{params.row["Date"]}</>;
       },
     },
   ];
@@ -142,7 +139,7 @@ export default function Content({ me, setMe }) {
               </div>
             ) : null}
             {me && emails.length > 0 ? (
-              <div style={{ height: 400, width: "100%" }}>
+              <div style={{ height: 1600, width: "100%" }}>
                 <DataGrid
                   rows={emails}
                   columns={columns}
