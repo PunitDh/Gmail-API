@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import GoogleButton from "react-google-button";
 import {
   AppBar,
+  Button,
   Toolbar,
   Typography,
   Paper,
@@ -18,14 +19,15 @@ import {
   getMe,
   handleLogin,
   getEmailIDs,
-  getEmail,
   getEmails,
+  batchDeleteEmails,
 } from "../api/api";
 import { extractData } from "../api/utils";
 
 export default function Content({ me, setMe }) {
   const [emails, setEmails] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selected, setSelected] = useState([]);
 
   useEffect(() => {
     getMe(setMe);
@@ -44,7 +46,22 @@ export default function Content({ me, setMe }) {
     }
   }, [me]);
 
+  const handleDelete = () => {
+    batchDeleteEmails(selected).then((res) => {
+      console.log(res.data);
+      setEmails(emails.filter((email) => !selected.includes(email.id)));
+    });
+  };
+
   const columns = [
+    {
+      field: "id",
+      headerName: "id",
+      width: "0",
+      renderCell: (params) => {
+        return <>{params.row.id}</>;
+      },
+    },
     {
       field: "From",
       headerName: "From",
@@ -139,14 +156,28 @@ export default function Content({ me, setMe }) {
               </div>
             ) : null}
             {me && emails.length > 0 ? (
-              <div style={{ height: 1600, width: "100%" }}>
-                <DataGrid
-                  rows={emails}
-                  columns={columns}
-                  pageSize={100}
-                  rowsPerPageOptions={[500]}
-                  checkboxSelection
-                />
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "flex-start",
+                  flexDirection: "column",
+                  width: "100%",
+                }}
+              >
+                <Button variant="contained" onClick={handleDelete}>
+                  Delete Selected
+                </Button>
+                <div style={{ height: 1600, width: "100%" }}>
+                  <DataGrid
+                    rows={emails}
+                    columns={columns}
+                    pageSize={100}
+                    rowsPerPageOptions={[100, 200, 300, 400, 500]}
+                    checkboxSelection
+                    columnVisibilityModel={{ id: false }}
+                    onSelectionModelChange={(e) => setSelected(e)}
+                  />
+                </div>
               </div>
             ) : null}
           </Typography>
