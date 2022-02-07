@@ -24,7 +24,7 @@ const {
   GOOGLE_USER_ACCESS_TOKEN_URL,
   GMAIL_THREADS_URL,
   GMAIL_BATCH_FETCH_URL,
-  GMAIL_BATCH_DELETE_URL,
+  NODE_ENV,
 } = process.env;
 
 app.use(
@@ -34,7 +34,9 @@ app.use(
   })
 );
 
-// app.use(express.static(path.join(__dirname, "client", "build")));
+if (NODE_ENV === "production") {
+  app.use(express.static(path.join(__dirname, "client", "build")));
+}
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
@@ -263,9 +265,11 @@ app.delete("/api/auth/logout", (req, res) => {
   }
 });
 
-// app.get("*", (req, res) => {
-//   res.sendFile(path.join(__dirname, "client", "build", "index.html"));
-// });
+if (NODE_ENV === "production") {
+  app.get("*", (req, res) => {
+    res.sendFile(path.join(__dirname, "client", "build", "index.html"));
+  });
+}
 
 app.listen(PORT, () => {
   console.log("Server listening on port", PORT);
