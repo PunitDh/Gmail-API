@@ -22,6 +22,7 @@ const {
   GOOGLE_TOKEN_URL,
   GOOGLE_USER_ACCESS_TOKEN_URL,
   GMAIL_THREADS_URL,
+  GMAIL_BATCH_FETCH_URL,
   GMAIL_BATCH_DELETE_URL,
 } = process.env;
 
@@ -32,8 +33,8 @@ app.use(
   })
 );
 
-app.use(express.static(path.join(__dirname, "client", "build")));
-app.use(express.json());
+// app.use(express.static(path.join(__dirname, "client", "build")));
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 function getGoogleAuthURL() {
@@ -79,7 +80,7 @@ app.get("/auth/google/url", (req, res) => {
 });
 
 // Getting the user from Google with the code
-app.get(REDIRECT_URI, async (req, res) => {
+app.get("/auth/google/", async (req, res) => {
   console.log("Started GET /auth/google/ at", new Date().toLocaleString());
   const code = req.query.code;
   const { id_token, access_token } = await getTokens({
@@ -181,9 +182,49 @@ app.get("/api/emails/:id", (req, res) => {
     });
 });
 
+// Batch fetch emails
+app.post("/api/batchfetch", (req, res) => {
+  console.log(`Started POST /api/batchfetch at`, new Date().toLocaleString());
+
+  const emailIDs = req.body.emailIDs.split(",");
+  const options = querystring.stringify({
+    format: "metadata",
+    metadataHeaders: ["From", "Subject", "Date"],
+  });
+
+  let body = "";
+
+  emailIDs.forEach((emailID) => {
+    body += `--foo_bar\nContent-Type: application/http\n\nGET /gmail/v1/users/me/threads/${emailID}?${options} HTTP/1.1\n\n`;
+  });
+
+  body += `--foo_bar--`;
+
+  return axios
+    .post(GMAIL_BATCH_FETCH_URL, body, {
+      headers: {
+        "Content-Type": 'multipart/mixed; boundary="foo_bar"',
+        Authorization: `Bearer ${req.cookies.access_token}`,
+        Accept: "*/*",
+        "Accept-Encoding": "gzip, deflate, br",
+        Connection: "keep-alive",
+      },
+    })
+    .then((response) => {
+      console.log(response.data);
+      return res.status(200).send(response.data);
+    })
+    .catch((err) => {
+      console.log(err.message);
+    });
+});
+
 // Batch delete emails
 app.post("/api/emails/batchdelete", (req, res) => {
-  console.log(`Started POST /api/emails/batch at`, new Date().toLocaleString());
+  console.log(
+    `Started POST /api/emails/batchdelete at`,
+    new Date().toLocaleString()
+  );
   const options = {
     ids: req.body.ids,
   };
@@ -215,9 +256,9 @@ app.delete("/api/auth/logout", (req, res) => {
   }
 });
 
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "client", "build", "index.html"));
-});
+// app.get("*", (req, res) => {
+//   res.sendFile(path.join(__dirname, "client", "build", "index.html"));
+// });
 
 app.listen(PORT, () => {
   console.log("Listening on port", PORT);

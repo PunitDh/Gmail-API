@@ -14,7 +14,13 @@ import { DataGrid } from "@mui/x-data-grid";
 import SearchIcon from "@mui/icons-material/Search";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import LinearProgress from "@mui/material/LinearProgress";
-import { getMe, handleLogin, getEmailIDs, getEmail } from "../api/api";
+import {
+  getMe,
+  handleLogin,
+  getEmailIDs,
+  getEmail,
+  getEmails,
+} from "../api/api";
 import { extractData } from "../api/utils";
 
 export default function Content({ me, setMe }) {
@@ -29,12 +35,14 @@ export default function Content({ me, setMe }) {
     if (me) {
       getEmailIDs().then((res) => {
         const emailIDs = res.data;
-        const emailPromises = emailIDs.map((emailID) => getEmail(emailID));
-        Promise.all(emailPromises).then((es) => {
-          es = extractData(es);
-          setEmails(es);
-          setLoading(false);
-        });
+        console.log(emailIDs);
+        getEmails(emailIDs).then((response) => console.log(response.data));
+        // const emailPromises = emailIDs.map((emailID) => getEmail(emailID));
+        // Promise.all(emailPromises).then((es) => {
+        //   es = extractData(es);
+        //   setEmails(es);
+        //   setLoading(false);
+        // });
       });
     }
   }, [me]);

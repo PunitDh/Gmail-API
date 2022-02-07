@@ -21,10 +21,17 @@ export const handleLogout = (setMe) => {
   });
 };
 
-export const getEmailIDs = () => {
-  return axios.get("/api/emails", { withCredentials: true });
-};
+export const getEmailIDs = () =>
+  axios.get("/api/emails", { withCredentials: true });
 
-export const getEmail = (emailID) => {
-  return axios.get(`/api/emails/${emailID}`, { withCredentials: true });
+export const getEmail = (emailID) =>
+  axios.get(`/api/emails/${emailID}`, { withCredentials: true });
+
+export const getEmails = (emailIDs) => {
+  const body = new URLSearchParams();
+  body.append("emailIDs", emailIDs);
+
+  return axios.post(`/api/batchfetch`, body, {
+    withCredentials: true,
+  });
 };
