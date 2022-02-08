@@ -26,3 +26,5 @@
 .env
 /client/.env
 client_secret_*.json
+
+test.js

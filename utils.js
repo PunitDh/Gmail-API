@@ -16,4 +16,13 @@ function parseBatch(responseCollection) {
   return items;
 }
 
-module.exports = { parseBatch };
+function chunkArray(myArray, chunk_size) {
+  var results = [];
+  array = myArray.slice();
+  while (array.length) {
+    results.push(array.splice(0, chunk_size));
+  }
+  return results;
+}
+
+module.exports = { parseBatch, chunkArray };

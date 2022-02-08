@@ -38,6 +38,7 @@ export default function Content({ me, setMe }) {
       getEmailIDs().then((res) => {
         const emailIDs = res.data;
         getEmails(emailIDs).then((response) => {
+          console.log(response.data);
           const es = extractData(response.data);
           setEmails(es);
           setLoading(false);
