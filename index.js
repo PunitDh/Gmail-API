@@ -186,7 +186,8 @@ app.post("/api/batchfetch", (req, res) => {
   console.log(`Started POST /api/batchfetch at`, new Date().toLocaleString());
 
   const emailIDs = req.body.emailIDs.split(",");
-  const emailBatches = chunkArray(emailIDs, 100);
+  const emailBatches = chunkArray(emailIDs, 10);
+  console.log(emailBatches);
   const options = querystring.stringify({
     format: "metadata",
     metadataHeaders: ["From", "Subject", "Date"],
@@ -194,26 +195,27 @@ app.post("/api/batchfetch", (req, res) => {
 
   let resultsBatch = [];
 
-  emailBatches.forEach((emailIDBatch) => {
+  emailBatches.forEach(async (emailIDBatch) => {
     let body = "";
     emailIDBatch.forEach((emailID) => {
       body += `--foo_bar\nContent-Type: application/http\n\nGET /gmail/v1/users/me/threads/${emailID}?${options} HTTP/1.1\n\n`;
     });
     body += `--foo_bar--`;
-    axios
+    await axios
       .post(GMAIL_BATCH_FETCH_URL, body, {
         headers: {
           "Content-Type": 'multipart/mixed; boundary="foo_bar"',
           Authorization: `Bearer ${req.cookies.access_token}`,
           Accept: "*/*",
           "Accept-Encoding": "gzip, deflate, br",
-          Connection: "keep-alive",
+          Connection: "close",
         },
       })
       .then((response) => {
         const data = parseBatch(response.data);
         resultsBatch = [...resultsBatch, ...data];
         if (resultsBatch.length === emailIDs.length) {
+          console.log(resultsBatch);
           return res.status(200).send(resultsBatch);
         }
       })
