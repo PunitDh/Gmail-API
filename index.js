@@ -195,9 +195,9 @@ app.post("/api/batchfetch", (req, res) => {
 
   let resultsBatch = [];
 
-  emailBatches.forEach((emailIDBatch) => {
+  emailBatches.forEach((emailIDBatch, index) => {
     let body = "";
-    emailIDBatch.forEach((emailID, index) => {
+    emailIDBatch.forEach((emailID) => {
       body += `--foo_bar\nContent-Type: application/http\n\nGET /gmail/v1/users/me/threads/${emailID}?${options} HTTP/1.1\n\n`;
     });
     body += `--foo_bar--`;
