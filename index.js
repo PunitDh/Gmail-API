@@ -186,7 +186,7 @@ app.post("/api/batchfetch", (req, res) => {
   console.log(`Started POST /api/batchfetch at`, new Date().toLocaleString());
 
   const emailIDs = req.body.emailIDs.split(",");
-  const emailBatches = chunkArray(emailIDs, 50);
+  const emailBatches = chunkArray(emailIDs, 100);
   console.log(emailBatches);
   const options = querystring.stringify({
     format: "metadata",
