@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import SearchIcon from "@mui/icons-material/Search";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import {
@@ -9,23 +9,9 @@ import {
   Tooltip,
   IconButton,
 } from "@mui/material/";
-import { searchEmail } from "./utils/utils";
 import "./refreshicon.css";
 
-function EmailsAppBar({ emails, fetchEmails, loading }) {
-  const [search, setSearch] = useState(null);
-
-  const handleSearch = (e) => {
-    e.preventDefault();
-    setSearch(e.target.value.toLowerCase());
-    emails.forEach((email) => {
-      const isVisible = searchEmail(email, search);
-      document.getElementById(email.id).style.display = isVisible
-        ? "flex"
-        : "none";
-    });
-  };
-
+function EmailsAppBar({ fetchEmails, loading, search, handleSearch }) {
   return (
     <div style={{ marginLeft: "10px" }}>
       <AppBar

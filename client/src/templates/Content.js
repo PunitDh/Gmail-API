@@ -8,11 +8,30 @@ import DataTable from "./DataTable";
 import DataHead from "./DataHead";
 import EmailsAppBar from "./EmailsAppBar";
 import { EmailsContainer, LoadingBarContainer } from "./utils/styles";
+import { searchEmail } from "./utils/utils";
 
 export default function Content({ me, setMe }) {
   const [emails, setEmails] = useState([]);
   const [loading, setLoading] = useState(false);
   const [selected, setSelected] = useState([]);
+  const [search, setSearch] = useState("");
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    setSearch(e.target.value.toLowerCase());
+    if (search !== "") {
+      emails.forEach((email) => {
+        const isVisible = searchEmail(email, search);
+        document.getElementById(email.id).style.display = isVisible
+          ? "table-row"
+          : "none";
+      });
+    } else {
+      emails.forEach((email) => {
+        document.getElementById(email.id).style.display = "table-row";
+      });
+    }
+  };
 
   useEffect(() => {
     getMe(setMe);
@@ -24,7 +43,6 @@ export default function Content({ me, setMe }) {
       getEmailIDs().then((res) => {
         const emailIDs = res.data;
         getEmails(emailIDs).then((response) => {
-          console.log(response.data);
           const es = extractData(response.data);
           setEmails(es);
           setLoading(false);
@@ -37,6 +55,8 @@ export default function Content({ me, setMe }) {
     fetchEmails();
   }, [me]);
 
+  console.log({ search });
+
   return (
     <Paper sx={{ maxWidth: "100%", margin: "auto" }}>
       {me ? (
@@ -45,6 +65,9 @@ export default function Content({ me, setMe }) {
             emails={emails}
             fetchEmails={fetchEmails}
             loading={loading}
+            search={search}
+            setSearch={setSearch}
+            handleSearch={handleSearch}
           />
           <div>
             {loading ? (

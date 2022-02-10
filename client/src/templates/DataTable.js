@@ -3,7 +3,6 @@ import {
   Table,
   TableRow,
   TableHead,
-  TableBody,
   TableHeadCell,
   TableCheckboxCell,
   TableCell,
@@ -32,6 +31,11 @@ function DataTable({ emails, setEmails, selected, setSelected }) {
     }
   };
 
+  const handleRowSelect = (emailId) => {
+    const checkbox = document.getElementById(`checkbox-${emailId}`);
+    checkbox.click();
+  };
+
   const handleSelectAll = (e) => {
     if (e.target.checked) {
       setSelected(emails.map((email) => email.id));
@@ -54,58 +58,55 @@ function DataTable({ emails, setEmails, selected, setSelected }) {
     setEmails(sortEmails(emails, sortBy, sortDirection));
   };
 
-  console.log({ sortBy, sortDirection });
+  const sortText = (sortedBy) =>
+    sortBy === sortedBy ? (sortDirection ? "▲" : "▼") : null;
 
   return (
     <div>
       <Table>
-        <TableBody>
-          <TableHead>
-            <TableCheckboxCell>
+        <TableHead>
+          <TableCheckboxCell>
+            <input
+              type="checkbox"
+              style={{ cursor: "pointer" }}
+              onChange={handleSelectAll}
+            />
+          </TableCheckboxCell>
+          <TableHeadCell onClick={() => handleSort(SORTS.From)}>
+            From {sortText(SORTS.From)}
+          </TableHeadCell>
+          <TableHeadCell onClick={() => handleSort(SORTS.Subject)}>
+            Subject {sortText(SORTS.Subject)}
+          </TableHeadCell>
+          <TableHeadCell onClick={() => handleSort(SORTS.Snippet)}>
+            Message {sortText(SORTS.Snippet)}
+          </TableHeadCell>
+          <TableHeadCell onClick={() => handleSort(SORTS.Date)}>
+            Date {sortText(SORTS.Date)}
+          </TableHeadCell>
+        </TableHead>
+        {emails.map((email) => (
+          <TableRow
+            key={email.id}
+            id={email.id}
+            onClick={() => handleRowSelect(email.id)}
+          >
+            <TableCheckboxCell emailId={email.id}>
               <input
                 type="checkbox"
-                style={{ cursor: "pointer" }}
-                onChange={handleSelectAll}
+                id={`checkbox-${email.id}`}
+                value={email.id}
+                onChange={(e) => handleSelect(e)}
               />
             </TableCheckboxCell>
-            <TableHeadCell onClick={() => handleSort(SORTS.From)}>
-              From {sortBy === SORTS.From ? (sortDirection ? "▲" : "▼") : null}
-            </TableHeadCell>
-            <TableHeadCell onClick={() => handleSort(SORTS.Subject)}>
-              Subject{" "}
-              {sortBy === SORTS.Subject ? (sortDirection ? "▲" : "▼") : null}
-            </TableHeadCell>
-            <TableHeadCell onClick={() => handleSort(SORTS.Snippet)}>
-              Message{" "}
-              {sortBy === SORTS.Snippet ? (sortDirection ? "▲" : "▼") : null}
-            </TableHeadCell>
-            <TableHeadCell onClick={() => handleSort(SORTS.Date)}>
-              Date {sortBy === SORTS.Date ? (sortDirection ? "▲" : "▼") : null}
-            </TableHeadCell>
-          </TableHead>
-          {emails.map((email) => (
-            <TableRow
-              key={email.id}
-              id={email.id}
-              style={{ cursor: "pointer" }}
-            >
-              <TableCheckboxCell emailId={email.id}>
-                <input
-                  type="checkbox"
-                  id={`checkbox-${email.id}`}
-                  value={email.id}
-                  onChange={(e) => handleSelect(e)}
-                />
-              </TableCheckboxCell>
-              <TableCell emailId={email.id}>{email.From}</TableCell>
-              <TableCell emailId={email.id}>{email.Subject}</TableCell>
-              <TableCell emailId={email.id}>
-                {email.snippet.substr(0, 50)}...
-              </TableCell>
-              <TableCell emailId={email.id}>{email.Date}</TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
+            <TableCell emailId={email.id}>{email.From}</TableCell>
+            <TableCell emailId={email.id}>{email.Subject}</TableCell>
+            <TableCell emailId={email.id}>
+              {email.snippet.substr(0, 50)}...
+            </TableCell>
+            <TableCell emailId={email.id}>{email.Date}</TableCell>
+          </TableRow>
+        ))}
       </Table>
     </div>
   );
