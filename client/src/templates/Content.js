@@ -173,6 +173,9 @@ export default function Content({ me, setMe }) {
                 </Button>
                 <div style={{ height: 1600, width: "100%" }}>
                   <DataGrid
+                    initialState={{
+                      sorting: { sortModel: [{ field: "Date", sort: "desc" }] },
+                    }}
                     rows={emails}
                     columns={columns}
                     pageSize={100}
