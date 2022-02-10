@@ -4,6 +4,9 @@ export const Table = styled.table({
   display: "flex",
   flexDirection: "column",
   maxWidth: "80vw",
+  marginLeft: "0.5rem",
+  borderCollapse: "collapse",
+  fontSize: "0.8rem",
 });
 
 export const TableRow = styled.tr({
@@ -25,6 +28,11 @@ export const TableHead = styled.th({
   borderBottom: "3px solid rgba(0,0,0,0.3)",
 });
 
+export const TableCheckboxCell = styled.td({
+  width: "5%",
+  marginRight: "1rem",
+});
+
 export const TableBody = styled.tbody({
   display: "flex",
   justifyContent: "space-between",
@@ -35,6 +43,7 @@ export const TableHeadCell = styled.td({
   display: "block",
   textAlign: "left",
   width: "100%",
+  cursor: "pointer",
 });
 
 export const TableCell = ({ emailId, children }) => (

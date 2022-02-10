@@ -1,14 +1,26 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Table,
   TableRow,
   TableHead,
   TableBody,
   TableHeadCell,
+  TableCheckboxCell,
   TableCell,
 } from "./utils/styles";
+import { sortEmails } from "./utils/utils";
 
-function DataTable({ emails, selected, setSelected }) {
+const SORTS = {
+  From: "From",
+  Subject: "Subject",
+  Date: "Date",
+  Snippet: "snippet",
+};
+
+function DataTable({ emails, setEmails, selected, setSelected }) {
+  const [sortBy, setSortBy] = useState(SORTS.Date);
+  const [sortDirection, setSortDirection] = useState(false);
+
   const handleSelect = (e) => {
     if (e.target.checked) {
       setSelected([...selected, e.target.value]);
@@ -36,34 +48,40 @@ function DataTable({ emails, selected, setSelected }) {
     }
   };
 
+  const handleSort = (sortBy) => {
+    setSortBy(sortBy);
+    setSortDirection(!sortDirection);
+    setEmails(sortEmails(emails, sortBy, sortDirection));
+  };
+
+  console.log({ sortBy, sortDirection });
+
   return (
     <div>
-      <Table
-        style={{
-          marginLeft: "0.25rem",
-          textAlign: "left",
-          borderCollapse: "collapse",
-          fontSize: "0.8rem",
-        }}
-      >
+      <Table>
         <TableBody>
           <TableHead>
-            <TableHeadCell
-              style={{
-                width: "5%",
-                marginRight: "1rem",
-              }}
-            >
+            <TableCheckboxCell>
               <input
                 type="checkbox"
                 style={{ cursor: "pointer" }}
                 onChange={handleSelectAll}
               />
+            </TableCheckboxCell>
+            <TableHeadCell onClick={() => handleSort(SORTS.From)}>
+              From {sortBy === SORTS.From ? (sortDirection ? "▲" : "▼") : null}
             </TableHeadCell>
-            <TableHeadCell>From</TableHeadCell>
-            <TableHeadCell>Subject</TableHeadCell>
-            <TableHeadCell>Message</TableHeadCell>
-            <TableHeadCell>Date</TableHeadCell>
+            <TableHeadCell onClick={() => handleSort(SORTS.Subject)}>
+              Subject{" "}
+              {sortBy === SORTS.Subject ? (sortDirection ? "▲" : "▼") : null}
+            </TableHeadCell>
+            <TableHeadCell onClick={() => handleSort(SORTS.Snippet)}>
+              Message{" "}
+              {sortBy === SORTS.Snippet ? (sortDirection ? "▲" : "▼") : null}
+            </TableHeadCell>
+            <TableHeadCell onClick={() => handleSort(SORTS.Date)}>
+              Date {sortBy === SORTS.Date ? (sortDirection ? "▲" : "▼") : null}
+            </TableHeadCell>
           </TableHead>
           {emails.map((email) => (
             <TableRow
@@ -71,17 +89,14 @@ function DataTable({ emails, selected, setSelected }) {
               id={email.id}
               style={{ cursor: "pointer" }}
             >
-              <TableHeadCell
-                style={{ width: "5%", marginRight: "1rem" }}
-                emailId={email.id}
-              >
+              <TableCheckboxCell emailId={email.id}>
                 <input
                   type="checkbox"
                   id={`checkbox-${email.id}`}
                   value={email.id}
                   onChange={(e) => handleSelect(e)}
                 />
-              </TableHeadCell>
+              </TableCheckboxCell>
               <TableCell emailId={email.id}>{email.From}</TableCell>
               <TableCell emailId={email.id}>{email.Subject}</TableCell>
               <TableCell emailId={email.id}>

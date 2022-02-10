@@ -61,6 +61,7 @@ export default function Content({ me, setMe }) {
                 />
                 <DataTable
                   emails={emails}
+                  setEmails={setEmails}
                   selected={selected}
                   setSelected={setSelected}
                 />
