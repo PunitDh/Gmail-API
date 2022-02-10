@@ -58,7 +58,7 @@ export default function Content({ me, setMe }) {
   console.log({ search });
 
   return (
-    <Paper sx={{ maxWidth: "100%", margin: "auto" }}>
+    <Paper sx={{ margin: "auto" }}>
       {me ? (
         <div>
           <EmailsAppBar

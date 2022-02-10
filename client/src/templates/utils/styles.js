@@ -26,12 +26,13 @@ export const TableCheckboxCell = styled.td({
 
 export const TableHeadCell = styled.td({
   cursor: "pointer",
-  margin: "auto",
+  width: "17%",
 });
 
 export const TableCell = styled.td({
   height: "100%",
-  margin: "auto",
+  width: "17%",
+  fontSize: "0.8rem",
 });
 
 export const EmailsContainer = styled.div({

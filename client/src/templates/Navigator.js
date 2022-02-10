@@ -12,9 +12,12 @@ import {
 } from "@mui/material";
 import PolicyIcon from "@mui/icons-material/Policy";
 import PeopleIcon from "@mui/icons-material/People";
+import EmailIcon from "@mui/icons-material/Email";
 import Logo from "../components/Logo";
 import { Link } from "react-router-dom";
 import { handleLogin, handleLogout } from "../api/api";
+import Privacy from "../Privacy";
+import Content from "./Content";
 
 const item = {
   py: "2px",
@@ -23,6 +26,7 @@ const item = {
   "&:hover, &:focus": {
     bgcolor: "rgba(255, 255, 255, 0.08)",
   },
+  width: "100%",
 };
 
 const itemCategory = {
@@ -65,17 +69,41 @@ export default function Navigator(props) {
 
         <Box sx={{ bgcolor: "#101F33" }}>
           <ListItem disablePadding>
-            <ListItemButton selected={false} sx={item} onClick={() => {}}>
-              <ListItemIcon>
-                <PolicyIcon />
-              </ListItemIcon>
-              <ListItemText>Privacy Policy</ListItemText>
-            </ListItemButton>
+            <Link
+              to="/privacy"
+              style={{ textDecoration: "none", width: "100%" }}
+            >
+              <ListItemButton
+                selected={props.Component === Privacy}
+                sx={item}
+                onClick={() => {}}
+              >
+                <ListItemIcon>
+                  <PolicyIcon />
+                </ListItemIcon>
+                <ListItemText>Privacy Policy</ListItemText>
+              </ListItemButton>
+            </Link>
+          </ListItem>
+
+          <ListItem disablePadding>
+            <Link to="/home" style={{ textDecoration: "none", width: "100%" }}>
+              <ListItemButton
+                selected={props.Component === Content}
+                sx={item}
+                onClick={() => {}}
+              >
+                <ListItemIcon>
+                  <EmailIcon />
+                </ListItemIcon>
+                <ListItemText>Emails</ListItemText>
+              </ListItemButton>
+            </Link>
           </ListItem>
 
           <ListItem disablePadding>
             <ListItemButton
-              selected={true}
+              selected={false}
               sx={item}
               onClick={me ? () => handleLogout(setMe) : handleLogin}
             >

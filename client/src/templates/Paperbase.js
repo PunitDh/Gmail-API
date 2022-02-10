@@ -166,7 +166,7 @@ theme = {
 
 const drawerWidth = 196;
 
-export default function Paperbase({ me, setMe }) {
+export default function Paperbase({ me, setMe, Component, props }) {
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const isSmUp = useMediaQuery(theme.breakpoints.up("sm"));
 
@@ -176,7 +176,7 @@ export default function Paperbase({ me, setMe }) {
 
   return (
     <ThemeProvider theme={theme}>
-      <Box sx={{ display: "flex", minHeight: "100vh" }}>
+      <Box sx={{ display: "flex" }}>
         <CssBaseline />
         <Box
           component="nav"
@@ -188,23 +188,25 @@ export default function Paperbase({ me, setMe }) {
               variant="temporary"
               open={mobileOpen}
               onClose={handleDrawerToggle}
+              {...props}
+              Component={Component}
             />
           )}
 
           <Navigator
-            me={me}
-            setMe={setMe}
+            {...props}
+            Component={Component}
             PaperProps={{ style: { width: drawerWidth } }}
             sx={{ display: { sm: "block", xs: "none" } }}
           />
         </Box>
         <Box sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
-          <Header onDrawerToggle={handleDrawerToggle} me={me} setMe={setMe} />
+          <Header onDrawerToggle={handleDrawerToggle} {...props} />
           <Box
             component="main"
             sx={{ flex: 1, py: 1, px: 0, bgcolor: "#eaeff1" }}
           >
-            <Content me={me} setMe={setMe} />
+            <Component {...props} />
           </Box>
           <Box component="footer" sx={{ p: 2, bgcolor: "#eaeff1" }}>
             <Copyright />

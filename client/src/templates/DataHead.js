@@ -17,6 +17,7 @@ function DataHead({ emails, selected, setEmails }) {
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "center",
+        marginLeft: "10px",
       }}
     >
       <Button
