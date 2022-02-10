@@ -195,33 +195,35 @@ app.post("/api/batchfetch", (req, res) => {
 
   let resultsBatch = [];
 
-  emailBatches.forEach(async (emailIDBatch) => {
+  emailBatches.forEach((emailIDBatch) => {
     let body = "";
-    emailIDBatch.forEach((emailID) => {
+    emailIDBatch.forEach((emailID, index) => {
       body += `--foo_bar\nContent-Type: application/http\n\nGET /gmail/v1/users/me/threads/${emailID}?${options} HTTP/1.1\n\n`;
     });
     body += `--foo_bar--`;
-    await axios
-      .post(GMAIL_BATCH_FETCH_URL, body, {
-        headers: {
-          "Content-Type": 'multipart/mixed; boundary="foo_bar"',
-          Authorization: `Bearer ${req.cookies.access_token}`,
-          Accept: "*/*",
-          "Accept-Encoding": "gzip, deflate, br",
-          Connection: "close",
-        },
-      })
-      .then((response) => {
-        const data = parseBatch(response.data);
-        resultsBatch = [...resultsBatch, ...data];
-        if (resultsBatch.length === emailIDs.length) {
-          console.log(resultsBatch);
-          return res.status(200).send(resultsBatch);
-        }
-      })
-      .catch((err) => {
-        console.log(err.message);
-      });
+    setTimeout(() => {
+      axios
+        .post(GMAIL_BATCH_FETCH_URL, body, {
+          headers: {
+            "Content-Type": 'multipart/mixed; boundary="foo_bar"',
+            Authorization: `Bearer ${req.cookies.access_token}`,
+            Accept: "*/*",
+            "Accept-Encoding": "gzip, deflate, br",
+            Connection: "close",
+          },
+        })
+        .then((response) => {
+          const data = parseBatch(response.data);
+          resultsBatch = [...resultsBatch, ...data];
+          if (resultsBatch.length === emailIDs.length) {
+            console.log(resultsBatch);
+            return res.status(200).send(resultsBatch);
+          }
+        })
+        .catch((err) => {
+          console.log(err.message);
+        });
+    }, index * 1000);
   });
 });
 
