@@ -1,39 +1,25 @@
-import React, { useState, useEffect } from "react";
-import GoogleButton from "react-google-button";
-import {
-  AppBar,
-  Button,
-  Toolbar,
-  Typography,
-  Paper,
-  Grid,
-  TextField,
-  Tooltip,
-  IconButton,
-} from "@mui/material/";
-import { DataGrid } from "@mui/x-data-grid";
-import SearchIcon from "@mui/icons-material/Search";
-import RefreshIcon from "@mui/icons-material/Refresh";
+import React, { useEffect, useState } from "react";
+import { Paper } from "@mui/material/";
 import LinearProgress from "@mui/material/LinearProgress";
-import {
-  getMe,
-  handleLogin,
-  getEmailIDs,
-  getEmails,
-  batchDeleteEmails,
-} from "../api/api";
+import { getMe, getEmailIDs, getEmails } from "../api/api";
 import { extractData } from "../api/utils";
+import LoginButton from "./LoginButton";
+import DataTable from "./DataTable";
+import DataHead from "./DataHead";
+import EmailsAppBar from "./EmailsAppBar";
+import { EmailsContainer, LoadingBarContainer } from "./utils/styles";
 
 export default function Content({ me, setMe }) {
   const [emails, setEmails] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [selected, setSelected] = useState([]);
 
   useEffect(() => {
     getMe(setMe);
   }, []);
 
-  useEffect(() => {
+  const fetchEmails = () => {
+    setLoading(true);
     if (me) {
       getEmailIDs().then((res) => {
         const emailIDs = res.data;
@@ -45,164 +31,41 @@ export default function Content({ me, setMe }) {
         });
       });
     }
-  }, [me]);
-
-  const handleDelete = () => {
-    batchDeleteEmails(selected).then((res) => {
-      console.log(res.data);
-      setEmails(emails.filter((email) => !selected.includes(email.id)));
-    });
   };
 
-  const columns = [
-    {
-      field: "id",
-      headerName: "id",
-      width: "0",
-      renderCell: (params) => {
-        return <>{params.row.id}</>;
-      },
-    },
-    {
-      field: "From",
-      headerName: "From",
-      width: "200",
-      renderCell: (params) => {
-        return <>{params.row["From"]}</>;
-      },
-    },
-    {
-      field: "Subject",
-      headerName: "Subject",
-      width: "200",
-      renderCell: (params) => {
-        return <>{params.row["Subject"]}</>;
-      },
-    },
-    {
-      field: "Message",
-      headerName: "Message",
-      width: "200",
-      renderCell: (params) => {
-        return <>{params.row["snippet"]}</>;
-      },
-    },
-    {
-      field: "Date",
-      headerName: "Date",
-      width: "200",
-      renderCell: (params) => {
-        return <>{params.row["Date"]}</>;
-      },
-      valueGetter: (params) => {
-        return Date.parse(params.row["Date"]);
-      },
-    },
-  ];
+  useEffect(() => {
+    fetchEmails();
+  }, [me]);
 
   return (
-    <Paper sx={{ maxWidth: "100%", margin: "auto", overflow: "hidden" }}>
+    <Paper sx={{ maxWidth: "100%", margin: "auto" }}>
       {me ? (
         <div>
-          <AppBar
-            position="static"
-            color="default"
-            elevation={0}
-            sx={{ borderBottom: "1px solid rgba(0, 0, 0, 0.12)" }}
-          >
-            <Toolbar>
-              <Grid container spacing={2} alignItems="center">
-                <Grid item>
-                  <SearchIcon color="inherit" sx={{ display: "block" }} />
-                </Grid>
-                <Grid item xs>
-                  <TextField
-                    fullWidth
-                    placeholder="Search by email address, phone number, or user UID"
-                    InputProps={{
-                      disableUnderline: true,
-                      sx: { fontSize: "default" },
-                    }}
-                    variant="standard"
-                  />
-                </Grid>
-                <Grid item>
-                  <Tooltip title="Reload">
-                    <IconButton>
-                      <RefreshIcon color="inherit" sx={{ display: "block" }} />
-                    </IconButton>
-                  </Tooltip>
-                </Grid>
-              </Grid>
-            </Toolbar>
-          </AppBar>
-          <Typography
-            sx={{ my: 0, mx: 0 }}
-            color="text.secondary"
-            align="center"
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            {loading ? (
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  width: "100%",
-                  height: "100%",
-                }}
-              >
+          <EmailsAppBar emails={emails} fetchEmails={fetchEmails} />
+          <div>
+            {loading && (
+              <LoadingBarContainer>
                 <LinearProgress style={{ width: "100%" }} />
-              </div>
-            ) : null}
-            {me && emails.length > 0 ? (
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "flex-start",
-                  flexDirection: "column",
-                  width: "100%",
-                }}
-              >
-                <Button variant="contained" onClick={handleDelete}>
-                  Delete Selected
-                </Button>
-                <div style={{ height: 1600, width: "100%" }}>
-                  <DataGrid
-                    initialState={{
-                      sorting: { sortModel: [{ field: "Date", sort: "desc" }] },
-                    }}
-                    rows={emails}
-                    columns={columns}
-                    pageSize={100}
-                    rowsPerPageOptions={[100, 200, 300, 400, 500]}
-                    checkboxSelection
-                    columnVisibilityModel={{ id: false }}
-                    onSelectionModelChange={(e) => setSelected(e)}
-                  />
-                </div>
-              </div>
-            ) : null}
-          </Typography>
+              </LoadingBarContainer>
+            )}
+            {me && emails.length > 0 && (
+              <EmailsContainer>
+                <DataHead
+                  emails={emails}
+                  setEmails={setEmails}
+                  selected={selected}
+                />
+                <DataTable
+                  emails={emails}
+                  selected={selected}
+                  setSelected={setSelected}
+                />
+              </EmailsContainer>
+            )}
+          </div>
         </div>
       ) : (
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            height: "80vh",
-          }}
-        >
-          <GoogleButton
-            style={{ position: "fixed" }}
-            onClick={() => handleLogin(setMe)}
-          />
-        </div>
+        <LoginButton setMe={setMe} />
       )}
     </Paper>
   );
