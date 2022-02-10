@@ -9,9 +9,10 @@ import {
   Tooltip,
   IconButton,
 } from "@mui/material/";
-import { searchEmail } from "../utils/utils";
+import { searchEmail } from "./utils/utils";
+import "./refreshicon.css";
 
-function EmailsAppBar({ emails, fetchEmails }) {
+function EmailsAppBar({ emails, fetchEmails, loading }) {
   const [search, setSearch] = useState(null);
 
   const handleSearch = (e) => {
@@ -41,7 +42,7 @@ function EmailsAppBar({ emails, fetchEmails }) {
             <Grid item xs>
               <TextField
                 fullWidth
-                placeholder="Search by email address, phone number, or user UID"
+                placeholder="Search by email address, subject line, or message"
                 InputProps={{
                   disableUnderline: true,
                   sx: { fontSize: "default" },
@@ -54,7 +55,11 @@ function EmailsAppBar({ emails, fetchEmails }) {
             <Grid item>
               <Tooltip title="Reload">
                 <IconButton onClick={fetchEmails}>
-                  <RefreshIcon color="inherit" sx={{ display: "block" }} />
+                  <RefreshIcon
+                    color="inherit"
+                    sx={{ display: "block" }}
+                    className={loading ? "refresh-icon-rotate" : null}
+                  />
                 </IconButton>
               </Tooltip>
             </Grid>

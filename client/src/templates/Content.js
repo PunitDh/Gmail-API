@@ -41,13 +41,17 @@ export default function Content({ me, setMe }) {
     <Paper sx={{ maxWidth: "100%", margin: "auto" }}>
       {me ? (
         <div>
-          <EmailsAppBar emails={emails} fetchEmails={fetchEmails} />
+          <EmailsAppBar
+            emails={emails}
+            fetchEmails={fetchEmails}
+            loading={loading}
+          />
           <div>
-            {loading && (
+            {loading ? (
               <LoadingBarContainer>
                 <LinearProgress style={{ width: "100%" }} />
               </LoadingBarContainer>
-            )}
+            ) : null}
             {me && emails.length > 0 && (
               <EmailsContainer>
                 <DataHead
