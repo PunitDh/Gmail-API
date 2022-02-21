@@ -381,3 +381,8 @@ div.firstFooter {
     -ms-text-size-adjust: 100%;
   }
 }
+
+.ContractText {
+  margin-left: 2rem;
+  width: 80%;
+}

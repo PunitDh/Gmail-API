@@ -27,6 +27,8 @@ const {
   NODE_ENV,
 } = process.env;
 
+const BATCH_SIZE = 100;
+
 app.use(
   cors({
     origin: UI_ROOT_URI,
@@ -34,9 +36,11 @@ app.use(
   })
 );
 
-if (NODE_ENV === "production") {
+const isProduction = NODE_ENV === "production";
+
+isProduction &&
   app.use(express.static(path.join(__dirname, "client", "build")));
-}
+
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
@@ -76,7 +80,7 @@ function getTokens({ code, client_id, client_secret, redirect_uri }) {
 }
 
 // Getting Login URL
-app.get("/auth/google/url", (req, res) => {
+app.get("/auth/google/url", (_, res) => {
   console.log("Started GET /auth/google/url at", new Date().toLocaleString());
   return res.send(getGoogleAuthURL());
 });
@@ -186,8 +190,8 @@ app.post("/api/batchfetch", (req, res) => {
   console.log(`Started POST /api/batchfetch at`, new Date().toLocaleString());
 
   const emailIDs = req.body.emailIDs.split(",");
-  const emailBatches = chunkArray(emailIDs, 100);
-  console.log(emailBatches);
+  const emailBatches = chunkArray(emailIDs, BATCH_SIZE);
+
   const options = querystring.stringify({
     format: "metadata",
     metadataHeaders: ["From", "Subject", "Date"],
@@ -231,33 +235,65 @@ app.post("/api/batchfetch", (req, res) => {
 app.post("/api/batchdelete", (req, res) => {
   console.log(`Started POST /api/batchdelete at`, new Date().toLocaleString());
   const emailIDs = req.body.emailIDs.split(",");
+  const emailBatches = chunkArray(emailIDs, BATCH_SIZE);
 
-  console.log(emailIDs);
+  let resultsBatch = [];
 
-  let body = "";
-
-  emailIDs.forEach((emailID) => {
-    body += `--foo_bar\nContent-Type: application/http\n\nDELETE /gmail/v1/users/me/threads/${emailID} HTTP/1.1\n\n`;
+  emailBatches.forEach((emailIDBatch, index) => {
+    let body = "";
+    emailIDBatch.forEach((emailID) => {
+      body += `--foo_bar\nContent-Type: application/http\n\nDELETE /gmail/v1/users/me/threads/${emailID} HTTP/1.1\n\n`;
+    });
+    body += `--foo_bar--`;
+    setTimeout(() => {
+      axios
+        .post(GMAIL_BATCH_FETCH_URL, body, {
+          headers: {
+            "Content-Type": 'multipart/mixed; boundary="foo_bar"',
+            Authorization: `Bearer ${req.cookies.access_token}`,
+            Accept: "*/*",
+            "Accept-Encoding": "gzip, deflate, br",
+            Connection: "close",
+          },
+        })
+        .then((response) => {
+          const data = parseBatch(response.data);
+          resultsBatch = [...resultsBatch, ...data];
+          if (resultsBatch.length === emailIDs.length) {
+            console.log(resultsBatch);
+            return res.status(200).send(resultsBatch);
+          }
+        })
+        .catch((err) => {
+          console.log(err.message);
+        });
+    }, index * 1000);
   });
 
-  body += `--foo_bar--`;
+  // let body = "";
 
-  return axios
-    .post(GMAIL_BATCH_FETCH_URL, body, {
-      headers: {
-        "Content-Type": 'multipart/mixed; boundary="foo_bar"',
-        Authorization: `Bearer ${req.cookies.access_token}`,
-        Accept: "*/*",
-        "Accept-Encoding": "gzip, deflate, br",
-        Connection: "keep-alive",
-      },
-    })
-    .then((response) => {
-      return res.status(200).send(response.data);
-    })
-    .catch((err) => {
-      console.log(err.message);
-    });
+  // emailIDs.forEach((emailID) => {
+  //   body += `--foo_bar\nContent-Type: application/http\n\nDELETE /gmail/v1/users/me/threads/${emailID} HTTP/1.1\n\n`;
+  // });
+
+  // body += `--foo_bar--`;
+
+  // return axios
+  //   .post(GMAIL_BATCH_FETCH_URL, body, {
+  //     headers: {
+  //       "Content-Type": 'multipart/mixed; boundary="foo_bar"',
+  //       Authorization: `Bearer ${req.cookies.access_token}`,
+  //       Accept: "*/*",
+  //       "Accept-Encoding": "gzip, deflate, br",
+  //       Connection: "keep-alive",
+  //     },
+  //   })
+  //   .then((response) => {
+  //     return res.status(200).send(response.data);
+  //   })
+  //   .catch((err) => {
+  //     console.log(err.message);
+  //   });
 });
 
 // Logout
@@ -274,11 +310,10 @@ app.delete("/api/auth/logout", (req, res) => {
   }
 });
 
-if (NODE_ENV === "production") {
+isProduction &&
   app.get("*", (req, res) => {
     res.sendFile(path.join(__dirname, "client", "build", "index.html"));
   });
-}
 
 app.listen(PORT, () => {
   console.log("Server listening on port", PORT);
