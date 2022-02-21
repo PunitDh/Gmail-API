@@ -269,31 +269,6 @@ app.post("/api/batchdelete", (req, res) => {
         });
     }, index * 1000);
   });
-
-  // let body = "";
-
-  // emailIDs.forEach((emailID) => {
-  //   body += `--foo_bar\nContent-Type: application/http\n\nDELETE /gmail/v1/users/me/threads/${emailID} HTTP/1.1\n\n`;
-  // });
-
-  // body += `--foo_bar--`;
-
-  // return axios
-  //   .post(GMAIL_BATCH_FETCH_URL, body, {
-  //     headers: {
-  //       "Content-Type": 'multipart/mixed; boundary="foo_bar"',
-  //       Authorization: `Bearer ${req.cookies.access_token}`,
-  //       Accept: "*/*",
-  //       "Accept-Encoding": "gzip, deflate, br",
-  //       Connection: "keep-alive",
-  //     },
-  //   })
-  //   .then((response) => {
-  //     return res.status(200).send(response.data);
-  //   })
-  //   .catch((err) => {
-  //     console.log(err.message);
-  //   });
 });
 
 // Logout

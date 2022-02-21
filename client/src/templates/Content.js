@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Paper } from "@mui/material/";
-import LinearProgress from "@mui/material/LinearProgress";
+import { Paper, LinearProgress } from "@mui/material/";
 import { getMe, getEmailIDs, getEmails } from "../api/api";
 import { extractData } from "../api/utils";
 import LoginButton from "./LoginButton";
@@ -70,11 +69,11 @@ export default function Content({ me, setMe }) {
             handleSearch={handleSearch}
           />
           <div>
-            {loading ? (
+            {loading && (
               <LoadingBarContainer>
                 <LinearProgress style={{ width: "100%" }} />
               </LoadingBarContainer>
-            ) : null}
+            )}
             {me && emails.length > 0 && (
               <EmailsContainer>
                 <DataHead
@@ -93,7 +92,7 @@ export default function Content({ me, setMe }) {
           </div>
         </div>
       ) : (
-        <LoginButton setMe={setMe} />
+        <LoginButton />
       )}
     </Paper>
   );

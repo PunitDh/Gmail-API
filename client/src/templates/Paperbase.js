@@ -1,13 +1,15 @@
 import * as React from "react";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import useMediaQuery from "@mui/material/useMediaQuery";
-import CssBaseline from "@mui/material/CssBaseline";
-import Box from "@mui/material/Box";
-import Typography from "@mui/material/Typography";
-import Link from "@mui/material/Link";
+import {
+  useMediaQuery,
+  CssBaseline,
+  Box,
+  Typography,
+  Link,
+} from "@mui/material";
 import Navigator from "./Navigator";
-import Content from "./Content";
 import Header from "./Header";
+import Footer from "../components/Footer";
 
 function Copyright() {
   return (
@@ -17,6 +19,7 @@ function Copyright() {
         Punit Dharmadhikari
       </Link>{" "}
       {new Date().getFullYear()}
+      <Footer />
     </Typography>
   );
 }
@@ -166,7 +169,7 @@ theme = {
 
 const drawerWidth = 196;
 
-export default function Paperbase({ me, setMe, Component, props }) {
+export default function Paperbase({ Component, props }) {
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const isSmUp = useMediaQuery(theme.breakpoints.up("sm"));
 
@@ -182,7 +185,7 @@ export default function Paperbase({ me, setMe, Component, props }) {
           component="nav"
           sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }}
         >
-          {isSmUp ? null : (
+          {!isSmUp && (
             <Navigator
               PaperProps={{ style: { width: drawerWidth } }}
               variant="temporary"

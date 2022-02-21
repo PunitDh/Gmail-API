@@ -1,6 +1,5 @@
 import React from "react";
 import styled from "@emotion/styled";
-import { Paper } from "@mui/material";
 import "./Privacy.css";
 
 const Container = styled.div({

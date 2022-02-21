@@ -31,7 +31,7 @@ export const getEmails = (emailIDs) => {
   const body = new URLSearchParams();
   body.append("emailIDs", emailIDs);
 
-  return axios.post(`/api/batchfetch`, body, {
+  return axios.post("/api/batchfetch", body, {
     withCredentials: true,
   });
 };
@@ -40,7 +40,7 @@ export const batchDeleteEmails = (emailIDs) => {
   const body = new URLSearchParams();
   body.append("emailIDs", emailIDs);
 
-  return axios.post(`/api/batchdelete`, body, {
+  return axios.post("/api/batchdelete", body, {
     withCredentials: true,
   });
 };

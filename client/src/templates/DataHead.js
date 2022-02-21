@@ -1,6 +1,7 @@
 import React from "react";
 import { Button } from "@mui/material/";
 import { batchDeleteEmails } from "../api/api";
+import { DataHeadContainer } from "./utils/styles";
 
 function DataHead({ emails, selected, setEmails }) {
   const handleDelete = () => {
@@ -10,30 +11,20 @@ function DataHead({ emails, selected, setEmails }) {
     });
   };
 
+  const buttonStyles = {
+    marginTop: "1rem",
+    marginBottom: "1rem",
+    borderRadius: "0.25rem",
+  };
+
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "center",
-        marginLeft: "10px",
-      }}
-    >
-      <Button
-        variant="contained"
-        style={{
-          marginTop: "1rem",
-          marginBottom: "1rem",
-          borderRadius: "0.75rem",
-        }}
-        onClick={handleDelete}
-      >
+    <DataHeadContainer>
+      <Button variant="contained" style={buttonStyles} onClick={handleDelete}>
         Delete Selected
       </Button>
       <div style={{ marginLeft: "2rem" }}>{selected.length} selected</div>
       <div style={{ marginLeft: "2rem" }}>{emails.length} emails total</div>
-    </div>
+    </DataHeadContainer>
   );
 }
 

@@ -59,7 +59,7 @@ function DataTable({ emails, setEmails, selected, setSelected }) {
   };
 
   const sortText = (sortedBy) =>
-    sortBy === sortedBy ? (sortDirection ? "▲" : "▼") : null;
+    sortBy === sortedBy && (sortDirection ? "▲" : "▼");
 
   return (
     <div>

@@ -13,8 +13,17 @@ import {
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import { handleLogin, handleLogout } from "../api/api";
+import { ButtonContainer } from "./utils/styles";
 
 function Header({ me, setMe, onDrawerToggle }) {
+  const buttonStyles = {
+    marginTop: "0.25rem",
+    backgroundColor: me ? "#F42240" : "#4085F4",
+    borderRadius: "0.25rem",
+    border: `1px solid ${me ? "#F42230" : "#3075F4"}`,
+    width: "6rem",
+  };
+
   return (
     <React.Fragment>
       <AppBar color="primary" position="sticky" elevation={0}>
@@ -61,30 +70,17 @@ function Header({ me, setMe, onDrawerToggle }) {
             </Grid>
             <Grid item></Grid>
             <Grid item>
-              {me ? (
-                <div style={{ display: "flex", flexDirection: "column" }}>
-                  Welcome, {me.name}
-                  <Button
-                    variant="contained"
-                    color="error"
-                    type="submit"
-                    onClick={() => handleLogout(setMe)}
-                  >
-                    Logout
-                  </Button>
-                </div>
-              ) : (
-                <div style={{ display: "flex", flexDirection: "column" }}>
-                  <Button
-                    variant="contained"
-                    type="submit"
-                    style={{ backgroundColor: "blue" }}
-                    onClick={handleLogin}
-                  >
-                    Login
-                  </Button>
-                </div>
-              )}
+              <ButtonContainer>
+                {me && `Welcome, ${me.name}`}
+                <Button
+                  variant="contained"
+                  type="submit"
+                  style={buttonStyles}
+                  onClick={me ? () => handleLogout(setMe) : handleLogin}
+                >
+                  {me ? "Logout" : "Login"}
+                </Button>
+              </ButtonContainer>
             </Grid>
           </Grid>
         </Toolbar>

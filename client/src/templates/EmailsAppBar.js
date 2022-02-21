@@ -44,7 +44,7 @@ function EmailsAppBar({ fetchEmails, loading, search, handleSearch }) {
                   <RefreshIcon
                     color="inherit"
                     sx={{ display: "block" }}
-                    className={loading ? "refresh-icon-rotate" : null}
+                    className={loading && "refresh-icon-rotate"}
                   />
                 </IconButton>
               </Tooltip>
